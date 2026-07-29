@@ -1,0 +1,164 @@
+/* ========== Header 动画 ========== */
+header {
+  transition: all 0.3s ease;
+}
+
+header.scrolled {
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+  border-bottom-color: transparent;
+}
+
+/* Logo 悬浮动画 */
+.logo {
+  transition: transform 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.logo img {
+  transition: filter 0.3s ease;
+}
+
+.logo:hover img {
+  filter: brightness(1.2);
+}
+
+/* 导航链接动画 */
+nav a {
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+nav a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--accent);
+  transition: width 0.3s ease;
+}
+
+nav a:hover::after {
+  width: 100%;
+}
+
+/* CTA 按钮动画 */
+.nav-cta {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.nav-cta::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.nav-cta:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.nav-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* 版本标签动画 */
+.version-tag {
+  transition: all 0.3s ease;
+}
+
+.version-tag:hover {
+  transform: scale(1.1);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* 主题切换按钮动画 */
+.icon-button {
+  transition: transform 0.3s ease;
+}
+
+.icon-button:hover {
+  transform: rotate(180deg) scale(1.1);
+}
+
+.theme-icon {
+  transition: filter 0.3s ease;
+}
+
+.icon-button:hover .theme-icon {
+  filter: drop-shadow(0 0 8px var(--accent));
+}
+
+/* 菜单按钮动画 */
+.menu-toggle {
+  transition: all 0.3s ease;
+}
+
+.menu-toggle span {
+  transition: all 0.3s ease;
+}
+
+.menu-toggle.active span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.menu-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-toggle.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* 移动端菜单动画 */
+@media (max-width: 720px) {
+  nav {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    flex-direction: column;
+    padding: 20px;
+    gap: 16px;
+    border-bottom: 1px solid var(--line);
+    transform: translateY(-100%);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  nav.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  nav a {
+    animation: slide-in-left 0.3s ease-out backwards;
+  }
+
+  nav.open a:nth-child(1) { animation-delay: 0.05s; }
+  nav.open a:nth-child(2) { animation-delay: 0.1s; }
+  nav.open a:nth-child(3) { animation-delay: 0.15s; }
+  nav.open a:nth-child(4) { animation-delay: 0.2s; }
+  nav.open a:nth-child(5) { animation-delay: 0.25s; }
+}

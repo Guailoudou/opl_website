@@ -1,0 +1,111 @@
+/* ========== Hero 区域动画 ========== */
+
+/* 标题文字动画 */
+.hero h1 {
+  animation: slide-up 0.8s ease-out;
+}
+
+.hero h1 em {
+  display: inline-block;
+  animation: glow-pulse 3s ease-in-out infinite;
+  border-radius: 4px;
+  padding: 0 8px;
+}
+
+/* 介绍文字动画 */
+.hero .intro {
+  animation: fade-in 1s ease-out 0.3s backwards;
+}
+
+/* 按钮组动画 */
+.hero .actions {
+  animation: fade-in 1s ease-out 0.5s backwards;
+}
+
+/* CTA 按钮动画 */
+.hero .button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.hero .button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.hero .button:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.hero .button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+/* 文字链接动画 */
+.text-link {
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.text-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--accent);
+  transition: width 0.3s ease;
+}
+
+.text-link:hover::after {
+  width: 100%;
+}
+
+.text-link:hover {
+  color: var(--accent);
+}
+
+/* 截图悬浮动画 */
+.app-screenshot {
+  animation: float 6s ease-in-out infinite, zoom-in 0.8s ease-out 0.4s backwards;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.app-screenshot:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.2);
+}
+
+/* 视差效果容器 */
+.hero-visual {
+  perspective: 1000px;
+}
+
+/* 眉毛标签动画 */
+.hero .eyebrow {
+  animation: fade-in 0.8s ease-out backwards;
+  letter-spacing: 0.2em;
+}
+
+/* 响应式调整 */
+@media (max-width: 720px) {
+  .hero h1 {
+    font-size: clamp(40px, 10vw, 64px);
+  }
+  
+  .app-screenshot {
+    animation: fade-in 0.8s ease-out 0.4s backwards;
+  }
+}

@@ -1,0 +1,69 @@
+/* ========== 全局动画关键帧 ========== */
+@keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0; } }
+@keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.6; transform:scale(1.1); } }
+@keyframes fade-in { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fade-in-delay { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+@keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-12px); } }
+@keyframes shimmer { 0% { background-position:-200% 0; } 100% { background-position:200% 0; } }
+@keyframes glow-pulse { 0%,100% { box-shadow:0 0 20px var(--glow); } 50% { box-shadow:0 0 40px var(--glow),0 0 60px var(--glow); } }
+@keyframes gradient-shift { 0% { background-position:0% 50%; } 50% { background-position:100% 50%; } 100% { background-position:0% 50%; } }
+@keyframes slide-in-left { from { opacity:0; transform:translateX(-40px); } to { opacity:1; transform:translateX(0); } }
+@keyframes slide-in-right { from { opacity:0; transform:translateX(40px); } to { opacity:1; transform:translateX(0); } }
+@keyframes scale-in { from { opacity:0; transform:scale(.9); } to { opacity:1; transform:scale(1); } }
+@keyframes rotate-in { from { opacity:0; transform:rotate(-10deg) scale(.9); } to { opacity:1; transform:rotate(0) scale(1); } }
+@keyframes bounce-in { 0% { opacity:0; transform:scale(.3); } 50% { transform:scale(1.05); } 70% { transform:scale(.95); } 100% { opacity:1; transform:scale(1); } }
+@keyframes typewriter { from { width:0; } to { width:100%; } }
+@keyframes cursor-blink { 0%,100% { border-right-color:var(--accent); } 50% { border-right-color:transparent; } }
+@keyframes ripple { 0% { transform:scale(0); opacity:.6; } 100% { transform:scale(4); opacity:0; } }
+@keyframes orbit { from { transform:rotate(0deg) translateX(120px) rotate(0deg); } to { transform:rotate(360deg) translateX(120px) rotate(-360deg); } }
+@keyframes dash { to { stroke-dashoffset:0; } }
+@keyframes wave { 0%,100% { transform:translateY(0) rotate(0deg); } 25% { transform:translateY(-5px) rotate(2deg); } 75% { transform:translateY(5px) rotate(-2deg); } }
+@keyframes particle-float { 0% { transform:translate(0,0) scale(1); opacity:0; } 10% { opacity:1; } 90% { opacity:1; } 100% { transform:translate(var(--tx),var(--ty)) scale(0); opacity:0; } }
+@keyframes text-reveal { from { clip-path:inset(0 100% 0 0); } to { clip-path:inset(0 0 0 0); } }
+@keyframes border-dance { 0% { background-position:0% 0%; } 100% { background-position:300% 0%; } }
+@keyframes magnet { 0% { transform:translate(0,0); } 100% { transform:translate(var(--mx),var(--my)); } }
+@keyframes streak { 0% { transform:translateX(-100%); opacity:0; } 10% { opacity:1; } 90% { opacity:1; } 100% { transform:translateX(100vw); opacity:0; } }
+@keyframes spin-slow { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+@keyframes shake { 0%,100% { transform:translateX(0); } 25% { transform:translateX(-5px); } 75% { transform:translateX(5px); } }
+@keyframes slide-up { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
+@keyframes slide-down { from { opacity:0; transform:translateY(-40px); } to { opacity:1; transform:translateY(0); } }
+@keyframes zoom-in { from { opacity:0; transform:scale(0.8); } to { opacity:1; transform:scale(1); } }
+@keyframes flip-in { from { opacity:0; transform:perspective(400px) rotateY(90deg); } to { opacity:1; transform:perspective(400px) rotateY(0); } }
+@keyframes jelly { 0%,100% { transform:scale(1,1); } 25% { transform:scale(0.9,1.1); } 50% { transform:scale(1.1,0.9); } 75% { transform:scale(0.95,1.05); } }
+
+/* ========== 基础动画类 ========== */
+.fade-in { animation:fade-in .8s ease-out; }
+.fade-in-delay { animation:fade-in-delay 1s ease-out .2s both; }
+.scroll-fade { opacity:0; transform:translateY(20px); transition:opacity .6s ease-out,transform .6s ease-out; }
+.scroll-fade.visible { opacity:1; transform:translateY(0); }
+.scroll-slide-left { opacity:0; transform:translateX(-40px); transition:opacity .6s ease-out,transform .6s ease-out; }
+.scroll-slide-left.visible { opacity:1; transform:translateX(0); }
+.scroll-slide-right { opacity:0; transform:translateX(40px); transition:opacity .6s ease-out,transform .6s ease-out; }
+.scroll-slide-right.visible { opacity:1; transform:translateX(0); }
+.scroll-scale { opacity:0; transform:scale(0.9); transition:opacity .6s ease-out,transform .6s ease-out; }
+.scroll-scale.visible { opacity:1; transform:scale(1); }
+
+/* ========== 鼠标跟随光效 ========== */
+.cursor-glow { position:fixed; width:400px; height:400px; border-radius:50%; background:radial-gradient(circle,var(--glow) 0%,transparent 70%); pointer-events:none; z-index:0; transform:translate(-50%,-50%); transition:opacity .3s; opacity:0; }
+.cursor-glow.active { opacity:1; }
+@media (prefers-reduced-motion:reduce) { .cursor-glow { display:none; } }
+
+/* ========== 背景渐变动画 ========== */
+.bg-gradient { position:fixed; inset:0; z-index:-1; background:linear-gradient(135deg,var(--bg) 0%,color-mix(in srgb,var(--accent) 5%,var(--bg)) 50%,var(--bg) 100%); background-size:400% 400%; animation:gradient-shift 15s ease infinite; pointer-events:none; }
+
+/* ========== 背景粒子 ========== */
+.particles { position:fixed; inset:0; z-index:-1; pointer-events:none; overflow:hidden; }
+.particle { position:absolute; width:4px; height:4px; background:var(--accent); border-radius:50%; opacity:0; animation:particle-float linear infinite; }
+
+/* ========== 流星背景 ========== */
+.streaks { position:fixed; inset:0; z-index:-1; pointer-events:none; overflow:hidden; }
+.streak { position:absolute; height:1px; background:linear-gradient(90deg,transparent,var(--accent),transparent); opacity:.3; animation:streak linear infinite; }
+
+/* ========== 减少动画偏好 ========== */
+@media (prefers-reduced-motion:reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

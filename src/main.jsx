@@ -1,7 +1,9 @@
 import { createRoot } from 'react-dom/client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { siteConfig } from './site-config';
 import './styles.css';
+import { BackgroundEffects, CursorGlow, useScrollAnimation } from './animations';
+import { DeploymentUnitIcon, NetIcon, GameIcon, LinkIcon } from './components/Icons';
 
 const ICONS = '/img/icons';
 
@@ -29,11 +31,18 @@ function ThemeToggle() {
 
 function Header({ version }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
-    <header>
+    <header className={scrolled ? 'scrolled' : ''}>
       <Logo />
-      <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label="菜单">
+      <button className={`menu-toggle ${menuOpen ? 'active' : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="菜单">
         <span></span><span></span><span></span>
       </button>
       <nav className={menuOpen ? 'open' : ''}>
@@ -52,7 +61,7 @@ function Header({ version }) {
 }
 
 function SectionTitle({ eyebrow, title, children }) {
-  return <div className="section-title"><span>{eyebrow}</span><h2>{title}</h2>{children}</div>;
+  return <div className="section-title scroll-fade"><span>{eyebrow}</span><h2>{title}</h2>{children}</div>;
 }
 
 function LinkButton({ href, children, outline = false }) {
@@ -69,7 +78,7 @@ function LinkButton({ href, children, outline = false }) {
 function Hero({ links }) {
   return (
     <section className="hero" id="top">
-      <div className="hero-content fade-in">
+      <div className="hero-content">
         <p className="eyebrow">OPENP2P · 局域网联机工具</p>
         <h1>让好友加入<br /><em>你的局域网。</em></h1>
         <p className="intro">OPL 基于 OpenP2P，通过隧道或组网功能，让好友像在同一局域网一样连接你的游戏。支持 Minecraft、饥荒、泰拉瑞亚、星露谷等多种游戏。</p>
@@ -78,7 +87,7 @@ function Hero({ links }) {
           <a className="text-link" href="#guide">查看使用方法 ↓</a>
         </div>
       </div>
-      <div className="hero-visual fade-in-delay">
+      <div className="hero-visual">
         <img src="/img/opl.png" alt="OPL 联机工具界面截图" className="app-screenshot" />
       </div>
     </section>
@@ -89,7 +98,7 @@ function Download({ links }) {
   return (
     <section id="download">
       <SectionTitle eyebrow="DOWNLOAD" title="获取 OPL" />
-      <div className="download-card">
+      <div className="download-card scroll-scale">
         <div className="download-info">
           <b>OPL 联机工具</b>
           <p>Windows 10/11 · 免安装版 / 安装包 · 约 15MB</p>
@@ -110,29 +119,63 @@ function Guide({ links }) {
   return (
     <section id="guide">
       <SectionTitle eyebrow="GET STARTED" title="三步开始联机" />
-      <ol className="steps">{steps.map((step, index) => <li key={step}><span>0{index + 1}</span><p>{step}</p></li>)}</ol>
-      <div className="link-grid">{['docs', 'faq', 'source', 'community'].map((key) => <LinkButton key={key} href={links[key]} outline>{linkLabels[key]}</LinkButton>)}</div>
+      <ol className="steps">{steps.map((step, index) => <li key={step} className="scroll-fade" style={{ transitionDelay: `${index * 0.15}s` }}><span>0{index + 1}</span><p>{step}</p></li>)}</ol>
+      <div className="link-grid scroll-fade">{['docs', 'faq', 'source', 'community'].map((key) => <LinkButton key={key} href={links[key]} outline>{linkLabels[key]}</LinkButton>)}</div>
     </section>
+  );
+}
+
+// 3D 倾斜卡片组件
+function TiltCard({ children, style }) {
+  const cardRef = useRef(null);
+
+  const handleMouseMove = useCallback((e) => {
+    const card = cardRef.current;
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((y - centerY) / centerY) * -8;
+    const rotateY = ((x - centerX) / centerX) * 8;
+
+    // 直接设置 transform，绕过 CSS transition 延迟
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px) scale(1.02)`;
+    card.style.setProperty('--mouse-x', `${(x / rect.width) * 100}%`);
+    card.style.setProperty('--mouse-y', `${(y / rect.height) * 100}%`);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    const card = cardRef.current;
+    if (!card) return;
+    card.style.transform = '';
+  }, []);
+
+  return (
+    <div ref={cardRef} className="feature tilt" onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} style={style}>
+      {children}
+    </div>
   );
 }
 
 function Features() {
   const features = [
-    { icon: `${ICONS}/deploymentunit.svg`, title: '隧道穿透', desc: '基于 OpenP2P，支持 TCP/UDP 协议，轻松跨越网络限制' },
-    { icon: `${ICONS}/net.svg`, title: '组网功能', desc: '集成 EasyTier 组网，多设备互联，构建虚拟局域网' },
-    { icon: `${ICONS}/game.svg`, title: '多游戏支持', desc: '预设 MC、饥荒、泰拉瑞亚、星露谷等游戏配置，开箱即用' },
-    { icon: `${ICONS}/link.svg`, title: '连接码分享', desc: '一键导出连接码，好友导入即可快速连接，简单便捷' },
+    { Icon: DeploymentUnitIcon, title: '隧道穿透', desc: '基于 OpenP2P，支持 TCP/UDP 协议，轻松跨越网络限制' },
+    { Icon: NetIcon, title: '组网功能', desc: '集成 EasyTier 组网，多设备互联，构建虚拟局域网' },
+    { Icon: GameIcon, title: '多游戏支持', desc: '预设 MC、饥荒、泰拉瑞亚、星露谷等游戏配置，开箱即用' },
+    { Icon: LinkIcon, title: '连接码分享', desc: '一键导出连接码，好友导入即可快速连接，简单便捷' },
   ];
   return (
     <section id="features">
       <SectionTitle eyebrow="FEATURES" title="为什么选择 OPL" />
       <div className="feature-grid">
         {features.map((f, i) => (
-          <div key={f.title} className="feature scroll-fade" style={{ transitionDelay: `${i * 0.1}s` }}>
-            <span className="feature-icon"><img src={f.icon} alt="" className="feature-svg" /></span>
+          <TiltCard key={f.title} style={{ transitionDelay: `${i * 0.1}s` }}>
+            <span className="feature-icon"><f.Icon /></span>
             <h3>{f.title}</h3>
             <p>{f.desc}</p>
-          </div>
+          </TiltCard>
         ))}
       </div>
     </section>
@@ -140,7 +183,7 @@ function Features() {
 }
 
 function About() {
-  return <section id="about" className="about"><SectionTitle eyebrow="ABOUT OPL" title="少一点配置，多一点联机。" /><p>OPL 是基于 OpenP2P 的局域网联机工具，通过隧道穿透或组网功能，让好友像在同一局域网一样连接你的游戏。支持 Minecraft、饥荒、泰拉瑞亚、星露谷等多种游戏，提供连接码一键分享，简化联机流程。</p></section>;
+  return <section id="about" className="about scroll-fade"><SectionTitle eyebrow="ABOUT OPL" title="少一点配置，多一点联机。" /><p>OPL 是基于 OpenP2P 的局域网联机工具，通过隧道穿透或组网功能，让好友像在同一局域网一样连接你的游戏。支持 Minecraft、饥荒、泰拉瑞亚、星露谷等多种游戏，提供连接码一键分享，简化联机流程。</p></section>;
 }
 
 function Feedback() {
@@ -163,10 +206,10 @@ function Feedback() {
   return (
     <section id="feedback">
       <SectionTitle eyebrow="FEEDBACK" title="告诉我们你的问题" />
-      <div className="feedback-intro">
+      <div className="feedback-intro scroll-fade">
         <p>遇到问题或有改进建议？请填写下方表单，我们会在 <strong>24 小时内</strong>通过邮件回复您。</p>
       </div>
-      <form className="feedback-form" onSubmit={submit}>
+      <form className="feedback-form scroll-fade" onSubmit={submit}>
         <label>邮箱<input name="email" type="email" placeholder="name@example.com" required /></label>
         <label>标题<input name="title" maxLength="120" placeholder="一句话描述问题" required /></label>
         <label>详细说明<textarea name="body" rows="5" maxLength="5000" placeholder="请说明发生了什么、你的系统和游戏版本。" required /></label>
@@ -179,31 +222,31 @@ function Feedback() {
   );
 }
 
-function Footer() { return <footer><Logo /><p>OPL 联机工具 · 让联机回到简单</p><a href="/admin/">管理后台</a></footer>; }
+function Footer() { return <footer className="scroll-fade"><Logo /><p>OPL 联机工具 · 让联机回到简单</p><a href="/admin/">管理后台</a></footer>; }
 
 function App() {
   const [links, setLinks] = useState(siteConfig.fallbackLinks);
   useEffect(() => { fetch(`${siteConfig.apiBase}/links.php`).then((r) => r.ok ? r.json() : null).then((data) => data?.links && setLinks({ ...siteConfig.fallbackLinks, ...data.links })).catch(() => {}); }, []);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
+  // 启用滚动动画
+  useScrollAnimation();
 
-    const elements = document.querySelectorAll('.scroll-fade');
-    elements.forEach((el) => observer.observe(el));
-
-    return () => observer.disconnect();
-  }, []);
-
-  return <><Header version={links.version} /><main><Hero links={links} /><Download links={links} /><Features /><Guide links={links} /><About /><Feedback /></main><Footer /></>;
+  return (
+    <>
+      <BackgroundEffects />
+      <CursorGlow />
+      <Header version={links.version} />
+      <main>
+        <Hero links={links} />
+        <Download links={links} />
+        <Features />
+        <Guide links={links} />
+        <About />
+        <Feedback />
+      </main>
+      <Footer />
+    </>
+  );
 }
 
 createRoot(document.getElementById('root')).render(<App />);

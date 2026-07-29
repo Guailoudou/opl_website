@@ -1,0 +1,106 @@
+/* ========== Features 卡片动画 ========== */
+
+/* 卡片容器 */
+.feature-grid {
+  perspective: 1000px;
+}
+
+/* 单个卡片 */
+.feature {
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+/* 3D 倾斜模式：transform 由 JS 直接控制，不走 transition */
+.feature.tilt {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* 悬浮效果 */
+.feature:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--accent) 15%, transparent);
+  border-color: var(--accent);
+}
+
+/* 卡片光晕效果 */
+.feature::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    color-mix(in srgb, var(--accent) 10%, transparent),
+    transparent 50%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.feature:hover::before {
+  opacity: 1;
+}
+
+/* 图标动画 */
+.feature-icon {
+  transition: all 0.4s ease;
+}
+
+.feature:hover .feature-icon {
+  transform: scale(1.2) rotate(10deg);
+  filter: drop-shadow(0 0 12px var(--accent));
+}
+
+.feature-svg {
+  transition: all 0.4s ease;
+}
+
+.feature:hover .feature-svg {
+  animation: wave 1s ease-in-out;
+}
+
+/* 标题动画 */
+.feature h3 {
+  transition: color 0.3s ease;
+}
+
+.feature:hover h3 {
+  color: var(--accent);
+}
+
+/* 描述文字动画 */
+.feature p {
+  transition: color 0.3s ease;
+}
+
+.feature:hover p {
+  color: var(--text);
+}
+
+/* 交错入场动画 */
+.feature:nth-child(1) { transition-delay: 0s; }
+.feature:nth-child(2) { transition-delay: 0.1s; }
+.feature:nth-child(3) { transition-delay: 0.2s; }
+.feature:nth-child(4) { transition-delay: 0.3s; }
+
+/* 3D 倾斜效果 */
+.feature.tilt {
+  transform-style: preserve-3d;
+}
+
+.feature.tilt:hover {
+  transform: perspective(1000px) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)) translateY(-8px);
+}
+
+/* 响应式调整 */
+@media (max-width: 720px) {
+  .feature:hover {
+    transform: translateY(-4px);
+  }
+}

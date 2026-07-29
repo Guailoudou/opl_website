@@ -1,0 +1,229 @@
+/* ========== 各区域动画 ========== */
+
+/* ========== Section 标题动画 ========== */
+.section-title {
+  position: relative;
+}
+
+.section-title span {
+  display: inline-block;
+  animation: slide-in-left 0.6s ease-out;
+}
+
+.section-title h2 {
+  animation: slide-up 0.8s ease-out 0.2s backwards;
+}
+
+/* ========== Download 区域动画 ========== */
+.download-card {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.download-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--accent) 5%, transparent),
+    transparent
+  );
+  transition: left 0.6s ease;
+}
+
+.download-card:hover::before {
+  left: 100%;
+}
+
+.download-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+  border-color: var(--accent);
+}
+
+.download-info b {
+  transition: color 0.3s ease;
+}
+
+.download-card:hover .download-info b {
+  color: var(--accent);
+}
+
+.download-actions .button {
+  transition: all 0.3s ease;
+}
+
+.download-actions .button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.minor-link {
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.minor-link:hover {
+  transform: translateX(4px);
+  color: var(--accent);
+}
+
+/* ========== Steps 区域动画 ========== */
+.steps {
+  counter-reset: step-counter;
+}
+
+.steps li {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.steps li:hover {
+  transform: translateY(-4px);
+}
+
+.steps li::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+
+.steps li:hover::before {
+  transform: scaleX(1);
+}
+
+.steps span {
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.steps li:hover span {
+  transform: scale(1.2);
+  text-shadow: 0 0 12px var(--accent);
+}
+
+.steps p {
+  transition: color 0.3s ease;
+}
+
+.steps li:hover p {
+  color: var(--text);
+}
+
+/* ========== Link Grid 动画 ========== */
+.link-grid .button {
+  transition: all 0.3s ease;
+}
+
+.link-grid .button:hover {
+  transform: translateY(-4px) scale(1.02);
+  border-color: var(--accent);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+/* ========== About 区域动画 ========== */
+.about {
+  position: relative;
+}
+
+.about::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, var(--glow), transparent 70%);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+
+.about:hover::before {
+  opacity: 1;
+}
+
+.about p {
+  transition: color 0.3s ease;
+}
+
+.about:hover p {
+  color: var(--text);
+}
+
+/* ========== Footer 动画 ========== */
+footer {
+  transition: all 0.3s ease;
+}
+
+footer a {
+  transition: all 0.3s ease;
+}
+
+footer a:hover {
+  color: var(--accent);
+  transform: translateX(4px);
+}
+
+/* ========== 通用按钮动画 ========== */
+.button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.button:active::after {
+  width: 300px;
+  height: 300px;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.button.outline:hover {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+/* ========== 输入框动画 ========== */
+input, textarea {
+  transition: all 0.3s ease;
+}
+
+input:focus, textarea:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+/* ========== 表单结果动画 ========== */
+.form-result {
+  animation: bounce-in 0.6s ease-out;
+}
