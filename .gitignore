@@ -1,0 +1,7 @@
+config.local.php
+dist/
+.env
+.env.test
+.env.production
+.ssh
+node_modules

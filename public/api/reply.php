@@ -1,0 +1,24 @@
+<?php
+require __DIR__ . '/bootstrap.php';
+require_admin();
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') json_response(['message' => '仅支持 POST。'], 405);
+$data = request_data();
+$id = filter_var($data['id'] ?? null, FILTER_VALIDATE_INT);
+$body = trim((string) ($data['body'] ?? ''));
+if (!$id || $body === '' || mb_strlen($body) > 5000) json_response(['message' => '回复内容不正确。'], 422);
+$connection = db();
+$statement = $connection->prepare('SELECT email, title FROM feedback WHERE id = ?');
+$statement->bind_param('i', $id);
+$statement->execute();
+$feedback = $statement->get_result()->fetch_assoc();
+if (!$feedback) json_response(['message' => '反馈不存在。'], 404);
+$mail = $config['mail_api'];
+if (!$mail['url'] || str_starts_with($mail['url'], '填写')) json_response(['message' => '请先配置邮件 API。'], 500);
+$payload = http_build_query(['email' => $feedback['email'], 'body' => $body, 'title' => '回复：' . $feedback['title'], 'sendname' => $mail['sendname'], 'sendemail' => $mail['sendemail']]);
+$context = stream_context_create(['http' => ['method' => 'POST', 'header' => "Content-Type: application/x-www-form-urlencoded\r\nContent-Length: " . strlen($payload), 'content' => $payload, 'timeout' => 15, 'ignore_errors' => true]]);
+$result = @file_get_contents($mail['url'], false, $context);
+if ($result === false) json_response(['message' => '邮件 API 调用失败。'], 502);
+$update = $connection->prepare('UPDATE feedback SET reply_body = ?, replied_at = NOW() WHERE id = ?');
+$update->bind_param('si', $body, $id);
+$update->execute();
+json_response(['message' => '邮件已发送。']);
