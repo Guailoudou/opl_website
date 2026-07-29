@@ -4,7 +4,7 @@ import { siteConfig } from './site-config';
 import './styles.css';
 
 const api = (path, options) => fetch(`${siteConfig.apiBase}/${path}`, options).then(async (response) => ({ ok: response.ok, ...(await response.json()) }));
-const linkNames = { download: 'Windows 下载', changelog: '更新日志', docs: '使用文档', faq: '常见问题', source: '开源地址', community: '社区 / 反馈' };
+const linkNames = { download: 'Windows 下载', changelog: '更新日志', docs: '使用文档', faq: '常见问题', source: '开源地址', community: '社区 / 反馈', version: '版本号' };
 
 function Login({ onLogin }) {
   const [message, setMessage] = useState('');
@@ -14,7 +14,7 @@ function Login({ onLogin }) {
 
 function LinkSettings({ links, onSave }) {
   async function submit(event) { event.preventDefault(); const links = Object.fromEntries(new FormData(event.currentTarget)); const result = await api('links.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ links }) }); onSave(result.message); }
-  return <section><SectionTitle label="站点链接" /><form className="feedback-form" onSubmit={submit}>{Object.entries(linkNames).map(([key, name]) => <label key={key}>{name}<input type="url" name={key} defaultValue={links[key] || ''} placeholder="https://" /></label>)}<button className="button">保存链接</button></form></section>;
+  return <section><SectionTitle label="站点链接" /><form className="feedback-form" onSubmit={submit}>{Object.entries(linkNames).map(([key, name]) => <label key={key}>{name}<input type={key === 'version' ? 'text' : 'url'} name={key} defaultValue={links[key] || ''} placeholder={key === 'version' ? '例如：v1.0.3.5' : 'https://'} /></label>)}<button className="button">保存链接</button></form></section>;
 }
 
 function SectionTitle({ label }) { return <h2 className="admin-heading">{label}</h2>; }

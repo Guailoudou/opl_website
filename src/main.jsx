@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { siteConfig } from './site-config';
 import './styles.css';
 
+const ICONS = '/img/icons';
+
 const linkLabels = {
   download: 'Windows 下载', changelog: '更新日志', docs: '使用文档',
   faq: '常见问题', source: '开源地址', community: '社区 / 反馈',
@@ -18,11 +20,35 @@ function ThemeToggle() {
     document.documentElement.dataset.theme = theme;
     theme === 'system' ? localStorage.removeItem('opl-theme') : localStorage.setItem('opl-theme', theme);
   }, [theme]);
-  return <button className="icon-button" onClick={() => setTheme(theme === 'dark' ? 'light' : theme === 'light' ? 'system' : 'dark')} title="切换主题">◐</button>;
+  return (
+    <button className="icon-button" onClick={() => setTheme(theme === 'dark' ? 'light' : theme === 'light' ? 'system' : 'dark')} title="切换主题">
+      <img src={`${ICONS}/moon_circle_fill.svg`} alt="主题" className="theme-icon" />
+    </button>
+  );
 }
 
-function Header() {
-  return <header><Logo /><nav><a href="#download">下载</a><a href="#guide">文档</a><a href="#about">关于</a><a href="#feedback">反馈</a></nav><ThemeToggle /></header>;
+function Header({ version }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  return (
+    <header>
+      <Logo />
+      <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label="菜单">
+        <span></span><span></span><span></span>
+      </button>
+      <nav className={menuOpen ? 'open' : ''}>
+        <a href="#download" onClick={() => setMenuOpen(false)}>下载</a>
+        <a href="#guide" onClick={() => setMenuOpen(false)}>文档</a>
+        <a href="#about" onClick={() => setMenuOpen(false)}>关于</a>
+        <a href="#feedback" onClick={() => setMenuOpen(false)}>反馈</a>
+        <a href="#download" className="nav-cta" onClick={() => setMenuOpen(false)}>快速开始 →</a>
+      </nav>
+      <div className="header-right">
+        <span className="version-tag">{version || 'v1.0.3.5'}</span>
+        <ThemeToggle />
+      </div>
+    </header>
+  );
 }
 
 function SectionTitle({ eyebrow, title, children }) {
@@ -30,11 +56,33 @@ function SectionTitle({ eyebrow, title, children }) {
 }
 
 function LinkButton({ href, children, outline = false }) {
-  return href ? <a className={`button ${outline ? 'outline' : ''}`} href={href} target="_blank" rel="noreferrer">{children} <i>↗</i></a> : <span className={`button disabled ${outline ? 'outline' : ''}`}>{children} <i>↗</i></span>;
+  const arrow = <img src={`${ICONS}/arrow_right_up_and_square.svg`} alt="" className="btn-arrow" />;
+  return href ? (
+    <a className={`button ${outline ? 'outline' : ''}`} href={href} target="_blank" rel="noreferrer">
+      {children} {arrow}
+    </a>
+  ) : (
+    <span className={`button disabled ${outline ? 'outline' : ''}`}>{children} {arrow}</span>
+  );
 }
 
 function Hero({ links }) {
-  return <section className="hero" id="top"><div><p className="eyebrow">MINECRAFT · P2P MULTIPLAYER</p><h1>把好友带进<br /><em>你的世界。</em></h1><p className="intro">OPL 基于 OpenP2P，让 Minecraft 局域网世界跨越网络，简单地和好友一起玩。</p><div className="actions"><LinkButton href={links.download}>下载 OPL</LinkButton><a className="text-link" href="#guide">查看使用方法 ↓</a></div></div><div className="hero-card"><span className="status"><i /> 网络已就绪</span><p>创建世界后，生成联机码，分享给好友。</p></div></section>;
+  return (
+    <section className="hero" id="top">
+      <div className="hero-content fade-in">
+        <p className="eyebrow">OPENP2P · 局域网联机工具</p>
+        <h1>让好友加入<br /><em>你的局域网。</em></h1>
+        <p className="intro">OPL 基于 OpenP2P，通过隧道或组网功能，让好友像在同一局域网一样连接你的游戏。支持 Minecraft、饥荒、泰拉瑞亚、星露谷等多种游戏。</p>
+        <div className="actions">
+          <LinkButton href={links.download}>下载 OPL</LinkButton>
+          <a className="text-link" href="#guide">查看使用方法 ↓</a>
+        </div>
+      </div>
+      <div className="hero-visual fade-in-delay">
+        <img src="/img/opl.png" alt="OPL 联机工具界面截图" className="app-screenshot" />
+      </div>
+    </section>
+  );
 }
 
 function Download({ links }) {
@@ -44,12 +92,12 @@ function Download({ links }) {
       <div className="download-card">
         <div className="download-info">
           <b>OPL 联机工具</b>
-          <p>Windows 10/11 · 免安装 · 约 15MB</p>
-          <small>最新版本 v1.2.0 · 2026-07-15 更新</small>
+          <p>Windows 10/11 · 免安装版 / 安装包 · 约 15MB</p>
+          <small>最新版本 {links.version || 'v1.0.3.5'} · 原生支持 Win10-Win11</small>
         </div>
         <div className="download-actions">
           <LinkButton href={links.download}>立即下载</LinkButton>
-          <span className="download-meta">SHA256: a3f8e9...c7d2</span>
+          <span className="download-meta">提供免安装版、单文件版、安装包三种选择</span>
         </div>
       </div>
       {links.changelog && <a className="minor-link" href={links.changelog} target="_blank" rel="noreferrer">查看更新日志 →</a>}
@@ -58,24 +106,30 @@ function Download({ links }) {
 }
 
 function Guide({ links }) {
-  const steps = ['在 Minecraft 单人世界中选择“对局域网开放”。', '启动 OPL，生成联机码。', '将联机码发送给好友，由好友加入联机。'];
-  return <section id="guide"><SectionTitle eyebrow="GET STARTED" title="三步开始联机" /><ol className="steps">{steps.map((step, index) => <li key={step}><span>0{index + 1}</span><p>{step}</p></li>)}</ol><div className="link-grid">{['docs', 'faq', 'source', 'community'].map((key) => <LinkButton key={key} href={links[key]} outline>{linkLabels[key]}</LinkButton>)}</div></section>;
+  const steps = ['房主启动 OPL，新建隧道并启用，获取 UID 和端口号。', '连接者新建隧道，输入房主的 UID 和远程端口，启用隧道。', '隧道状态灯变绿后，使用 127.0.0.1 和对应端口连接游戏。'];
+  return (
+    <section id="guide">
+      <SectionTitle eyebrow="GET STARTED" title="三步开始联机" />
+      <ol className="steps">{steps.map((step, index) => <li key={step}><span>0{index + 1}</span><p>{step}</p></li>)}</ol>
+      <div className="link-grid">{['docs', 'faq', 'source', 'community'].map((key) => <LinkButton key={key} href={links[key]} outline>{linkLabels[key]}</LinkButton>)}</div>
+    </section>
+  );
 }
 
 function Features() {
   const features = [
-    { icon: '⚡', title: '零配置', desc: '无需端口转发、无需路由器设置，开箱即用' },
-    { icon: '🔒', title: '安全可靠', desc: 'P2P 直连，数据不经过第三方服务器' },
-    { icon: '🎮', title: '即开即用', desc: '联机码一键生成，好友秒速加入' },
-    { icon: '💻', title: '轻量免安装', desc: '单文件运行，不污染系统' },
+    { icon: `${ICONS}/deploymentunit.svg`, title: '隧道穿透', desc: '基于 OpenP2P，支持 TCP/UDP 协议，轻松跨越网络限制' },
+    { icon: `${ICONS}/net.svg`, title: '组网功能', desc: '集成 EasyTier 组网，多设备互联，构建虚拟局域网' },
+    { icon: `${ICONS}/game.svg`, title: '多游戏支持', desc: '预设 MC、饥荒、泰拉瑞亚、星露谷等游戏配置，开箱即用' },
+    { icon: `${ICONS}/link.svg`, title: '连接码分享', desc: '一键导出连接码，好友导入即可快速连接，简单便捷' },
   ];
   return (
     <section id="features">
       <SectionTitle eyebrow="FEATURES" title="为什么选择 OPL" />
       <div className="feature-grid">
-        {features.map((f) => (
-          <div key={f.title} className="feature">
-            <span className="feature-icon">{f.icon}</span>
+        {features.map((f, i) => (
+          <div key={f.title} className="feature scroll-fade" style={{ transitionDelay: `${i * 0.1}s` }}>
+            <span className="feature-icon"><img src={f.icon} alt="" className="feature-svg" /></span>
             <h3>{f.title}</h3>
             <p>{f.desc}</p>
           </div>
@@ -86,13 +140,16 @@ function Features() {
 }
 
 function About() {
-  return <section id="about" className="about"><SectionTitle eyebrow="ABOUT OPL" title="少一点配置，多一点联机。" /><p>OPL 是面向 Minecraft 玩家的联机辅助工具。它基于 OpenP2P，帮助自动发现局域网开放端口，并用联机码简化好友连接流程。</p></section>;
+  return <section id="about" className="about"><SectionTitle eyebrow="ABOUT OPL" title="少一点配置，多一点联机。" /><p>OPL 是基于 OpenP2P 的局域网联机工具，通过隧道穿透或组网功能，让好友像在同一局域网一样连接你的游戏。支持 Minecraft、饥荒、泰拉瑞亚、星露谷等多种游戏，提供连接码一键分享，简化联机流程。</p></section>;
 }
 
 function Feedback() {
   const [result, setResult] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   async function submit(event) {
     event.preventDefault();
+    setIsSubmitting(true);
     const data = Object.fromEntries(new FormData(event.currentTarget));
     try {
       const response = await fetch(`${siteConfig.apiBase}/feedback.php`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
@@ -100,8 +157,26 @@ function Feedback() {
       setResult(body.message || '已收到，感谢反馈。');
       if (response.ok) { event.currentTarget.reset(); setTimeout(() => setResult(''), 3000); }
     } catch { setResult('提交失败，请稍后重试。'); }
+    finally { setIsSubmitting(false); }
   }
-  return <section id="feedback"><SectionTitle eyebrow="FEEDBACK" title="告诉我们你的问题" /><form className="feedback-form" onSubmit={submit}><label>邮箱<input name="email" type="email" placeholder="name@example.com" required /></label><label>标题<input name="title" maxLength="120" placeholder="一句话描述问题" required /></label><label>详细说明<textarea name="body" rows="5" maxLength="5000" placeholder="请说明发生了什么、你的系统和游戏版本。" required /></label><button className="button" type="submit">提交反馈 →</button>{result && <p className="form-result">{result}</p>}</form></section>;
+
+  return (
+    <section id="feedback">
+      <SectionTitle eyebrow="FEEDBACK" title="告诉我们你的问题" />
+      <div className="feedback-intro">
+        <p>遇到问题或有改进建议？请填写下方表单，我们会在 <strong>24 小时内</strong>通过邮件回复您。</p>
+      </div>
+      <form className="feedback-form" onSubmit={submit}>
+        <label>邮箱<input name="email" type="email" placeholder="name@example.com" required /></label>
+        <label>标题<input name="title" maxLength="120" placeholder="一句话描述问题" required /></label>
+        <label>详细说明<textarea name="body" rows="5" maxLength="5000" placeholder="请说明发生了什么、你的系统和游戏版本。" required /></label>
+        <button className={`button ${isSubmitting ? 'loading' : ''}`} type="submit" disabled={isSubmitting}>
+          {isSubmitting ? '提交中...' : '提交反馈 →'}
+        </button>
+        {result && <p className="form-result">{result}</p>}
+      </form>
+    </section>
+  );
 }
 
 function Footer() { return <footer><Logo /><p>OPL 联机工具 · 让联机回到简单</p><a href="/admin/">管理后台</a></footer>; }
@@ -109,7 +184,26 @@ function Footer() { return <footer><Logo /><p>OPL 联机工具 · 让联机回�
 function App() {
   const [links, setLinks] = useState(siteConfig.fallbackLinks);
   useEffect(() => { fetch(`${siteConfig.apiBase}/links.php`).then((r) => r.ok ? r.json() : null).then((data) => data?.links && setLinks({ ...siteConfig.fallbackLinks, ...data.links })).catch(() => {}); }, []);
-  return <><Header /><main><Hero links={links} /><Download links={links} /><Features /><Guide links={links} /><About /><Feedback /></main><Footer /></>;
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const elements = document.querySelectorAll('.scroll-fade');
+    elements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
+
+  return <><Header version={links.version} /><main><Hero links={links} /><Download links={links} /><Features /><Guide links={links} /><About /><Feedback /></main><Footer /></>;
 }
 
 createRoot(document.getElementById('root')).render(<App />);
