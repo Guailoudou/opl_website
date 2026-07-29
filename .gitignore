@@ -5,3 +5,4 @@ dist/
 .env.production
 .ssh
 node_modules
+auth_config.php

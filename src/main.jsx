@@ -189,18 +189,69 @@ function About() {
 function Feedback() {
   const [result, setResult] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [captchaKey, setCaptchaKey] = useState('');
+  const [captchaUrl, setCaptchaUrl] = useState('');
+  const [captchaAnswer, setCaptchaAnswer] = useState('');
+  const [formData, setFormData] = useState({
+    email: '',
+    title: '',
+    body: ''
+  });
+
+  // 加载验证码
+  useEffect(() => {
+    loadCaptcha();
+  }, []);
+
+  async function loadCaptcha() {
+    try {
+      const response = await fetch(`${siteConfig.apiBase}/captcha_image.php?t=${Date.now()}`);
+      const key = response.headers.get('X-Captcha-Key');
+      if (key) {
+        setCaptchaKey(key);
+        const blob = await response.blob();
+        setCaptchaUrl(URL.createObjectURL(blob));
+      }
+    } catch (e) {
+      console.error('加载验证码失败:', e);
+    }
+  }
 
   async function submit(event) {
     event.preventDefault();
+    if (!captchaAnswer.trim()) {
+      setResult('请输入验证码答案');
+      return;
+    }
     setIsSubmitting(true);
-    const data = Object.fromEntries(new FormData(event.currentTarget));
+    const data = {
+      email: formData.email.trim(),
+      title: formData.title.trim(),
+      body: formData.body.trim(),
+      captcha_key: captchaKey,
+      captcha_answer: captchaAnswer,
+    };
+    let success = false;
     try {
       const response = await fetch(`${siteConfig.apiBase}/feedback.php`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-      const body = await response.json();
+      const text = await response.text();
+      let body;
+      try { body = JSON.parse(text); } catch { body = { message: text }; }
       setResult(body.message || '已收到，感谢反馈。');
-      if (response.ok) { event.currentTarget.reset(); setTimeout(() => setResult(''), 3000); }
-    } catch { setResult('提交失败，请稍后重试。'); }
-    finally { setIsSubmitting(false); }
+      success = response.ok;
+    } catch (e) {
+      console.error('提交失败:', e);
+      setResult('提交失败，请稍后重试。');
+    }
+    finally {
+      setIsSubmitting(false);
+      if (success) {
+        setFormData({ email: '', title: '', body: '' });
+        setCaptchaAnswer('');
+        setTimeout(() => setResult(''), 3000);
+      }
+      try { await loadCaptcha(); } catch {}
+    }
   }
 
   return (
@@ -210,9 +261,54 @@ function Feedback() {
         <p>遇到问题或有改进建议？请填写下方表单，我们会在 <strong>24 小时内</strong>通过邮件回复您。</p>
       </div>
       <form className="feedback-form scroll-fade" onSubmit={submit}>
-        <label>邮箱<input name="email" type="email" placeholder="name@example.com" required /></label>
-        <label>标题<input name="title" maxLength="120" placeholder="一句话描述问题" required /></label>
-        <label>详细说明<textarea name="body" rows="5" maxLength="5000" placeholder="请说明发生了什么、你的系统和游戏版本。" required /></label>
+        <label>邮箱
+          <input
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            placeholder="name@example.com"
+            required
+          />
+        </label>
+        <label>标题
+          <input
+            name="title"
+            type="text"
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            maxLength={120}
+            placeholder="一句话描述问题"
+            required
+          />
+        </label>
+        <label>详细说明
+          <textarea
+            name="body"
+            value={formData.body}
+            onChange={(e) => setFormData({ ...formData, body: e.target.value })}
+            rows={5}
+            maxLength={5000}
+            placeholder="请说明发生了什么、你的系统和游戏版本。"
+            required
+          />
+        </label>
+        <label className="captcha-label">
+          <span>验证码（计算结果）</span>
+          <div className="captcha-row">
+            {captchaUrl && <img src={captchaUrl} alt="验证码" className="captcha-image" />}
+            <input
+              name="captcha_answer"
+              type="text"
+              placeholder="输入计算结果"
+              value={captchaAnswer}
+              onChange={(e) => setCaptchaAnswer(e.target.value)}
+              required
+              autoComplete="off"
+            />
+            <button type="button" className="captcha-refresh" onClick={loadCaptcha} title="刷新验证码">🔄</button>
+          </div>
+        </label>
         <button className={`button ${isSubmitting ? 'loading' : ''}`} type="submit" disabled={isSubmitting}>
           {isSubmitting ? '提交中...' : '提交反馈 →'}
         </button>

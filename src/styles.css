@@ -73,6 +73,12 @@ input:focus,textarea:focus { outline:none; border-color:var(--accent); }
 .feedback-form .button { justify-self:start; }
 .button.loading { opacity:.7; cursor:wait; }
 .form-result { color:var(--accent); margin:0; animation:fade-in .3s ease-out; }
+.captcha-label { display:grid; gap:8px; }
+.captcha-row { display:flex; align-items:center; gap:12px; }
+.captcha-image { height:50px; border:1px solid var(--line); border-radius:4px; background:var(--surface); }
+.captcha-row input { flex:1; }
+.captcha-refresh { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:8px 12px; cursor:pointer; font-size:18px; transition:all .2s; }
+.captcha-refresh:hover { border-color:var(--accent); transform:rotate(180deg); }
 footer { min-height:130px; display:flex; align-items:center; gap:24px; color:var(--muted); font-size:13px; }
 footer a { margin-left:auto; }
 @media (max-width:720px) { header { height:64px; } nav { display:none; } section { padding:70px 0; } .hero,.about { min-height:0; grid-template-columns:1fr; gap:42px; } .hero { padding-top:70px; } .steps,.link-grid,.feature-grid { grid-template-columns:1fr 1fr; } .download-card { align-items:flex-start; flex-direction:column; } .download-actions { align-items:flex-start; } footer { flex-wrap:wrap; } footer a { margin-left:0; } }
