@@ -18,7 +18,14 @@ $payload = http_build_query(['email' => $feedback['email'], 'body' => $body, 'ti
 $context = stream_context_create(['http' => ['method' => 'POST', 'header' => "Content-Type: application/x-www-form-urlencoded\r\nContent-Length: " . strlen($payload), 'content' => $payload, 'timeout' => 15, 'ignore_errors' => true]]);
 $result = @file_get_contents($mail['url'], false, $context);
 if ($result === false) json_response(['message' => '邮件 API 调用失败。'], 502);
+// 追加回复（支持多次回复）
+$statement2 = $connection->prepare('SELECT reply_body FROM feedback WHERE id = ?');
+$statement2->bind_param('i', $id);
+$statement2->execute();
+$existing = $statement2->get_result()->fetch_assoc();
+$separator = "\n\n---\n\n";
+$newReply = $existing['reply_body'] ? $existing['reply_body'] . $separator . $body : $body;
 $update = $connection->prepare('UPDATE feedback SET reply_body = ?, replied_at = NOW() WHERE id = ?');
-$update->bind_param('si', $body, $id);
+$update->bind_param('si', $newReply, $id);
 $update->execute();
 json_response(['message' => '邮件已发送。']);
